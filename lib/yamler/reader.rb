@@ -1,11 +1,12 @@
 require "yaml"
+require "erb"
 
 module Yamler
   class Reader
     attr_reader :data
     
     def initialize(filepath)
-      @data = YAML.load(File.read(filepath)).try(:with_indifferent_access)
+      @data = YAML.load(parse_file(filepath)).try(:with_indifferent_access)
     end
     
     def [](key)
@@ -17,5 +18,13 @@ module Yamler
         hsh.try("[]", key)
       end
     end
+    
+    private 
+    
+    def parse_file(filepath)
+      erb = ERB.new(File.read(filepath))
+      erb.result(binding)
+    end
+    
   end
 end
